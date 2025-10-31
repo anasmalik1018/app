@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Gallery - Stunning Generated Images</title>
+    <meta name="description" content="Explore a collection of stunning AI-generated images. Browse through various styles and categories of AI art created with advanced image generation technology.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <!-- favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <style>
+     * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary-color: #f59e0b;
+    --accent-color: #10b981;
+    --background-color: #0f0f23;
+    --surface-color: #1a1a2e;
+    --surface-light: #252545;
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+    --border-color: #374151;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --gradient-secondary: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    --gradient-accent: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--background-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Background Animation */
+.bg-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.1;
+}
+
+.bg-animation::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 25% 25%, #6366f1 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #8b5cf6 0%, transparent 50%);
+    animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+/* Header - Desktop */
+.header {
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 1rem 0;
+    transition: all 0.3s ease;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+}
+
+.logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.logo i {
+    font-size: 1.8rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+}
+
+.nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--primary-color);
+}
+
+/* Main Container */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 8rem 2rem 2rem;
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* Filter Section */
+.filter-section {
+    background: var(--surface-color);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-xl);
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.filter-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.view-toggle {
+    display: flex;
+    background: var(--surface-light);
+    border-radius: 10px;
+    padding: 0.25rem;
+    gap: 0.25rem;
+}
+
+.view-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.view-btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.filter-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.filter-select {
+    padding: 0.75rem;
+    background: var(--surface-light);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    background: var(--surface-light);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+/* Gallery Section */
+.gallery-section {
+    margin-bottom: 3rem;
+}
+
+.gallery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.gallery-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.gallery-info {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.sort-dropdown {
+    padding: 0.5rem 1rem;
+    background: var(--surface-light);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+/* Image Grid */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.image-grid.masonry {
+    columns: 4;
+    column-gap: 2rem;
+}
+
+.image-card {
+    background: var(--surface-color);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    break-inside: avoid;
+    margin-bottom: 2rem;
+}
+
+.image-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.image-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.image-container.square {
+    aspect-ratio: 1;
+}
+
+.generated-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.image-card:hover .generated-image {
+    transform: scale(1.05);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 1rem;
+}
+
+.image-card:hover .image-overlay {
+    opacity: 1;
+}
+
+.image-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-self: flex-end;
+}
+
+.action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: none;
+    padding: 0.75rem;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.action-btn:hover {
+    background: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.image-info {
+    padding: 1rem;
+}
+
+.image-prompt {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.image-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.image-tags {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.tag {
+    background: var(--surface-light);
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.favorite-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.favorite-btn.favorited {
+    color: var(--error-color);
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 3rem;
+}
+
+.pagination-btn {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.pagination-btn:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.pagination-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Loading Animation */
+.loading {
+    text-align: center;
+    padding: 3rem;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--border-color);
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    background: var(--surface-color);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+}
+
+.modal-image {
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    object-fit: contain;
+}
+
+.modal-info {
+    padding: 1.5rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.btn-secondary {
+    background: var(--surface-light);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .image-grid.masonry {
+        columns: 3;
+    }
+}
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+    .hero h1 {
+        font-size: 3rem;
+    }
+    
+    .hero-stats {
+        gap: 2rem;
+    }
+    
+    .filter-controls {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    
+    .image-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    /* Mobile header - moved to bottom */
+    .header {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.75rem 0;
+        background: rgba(26, 26, 46, 0.98);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid var(--border-color);
+        border-bottom: none;
+        box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+    }
+
+    .header-content {
+        padding: 0;
+        justify-content: center;
+        max-width: 100%;
+    }
+
+    .logo {
+        display: none;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 0;
+        justify-content: space-around;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .nav-links a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        position: relative;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+        background: rgba(99, 102, 241, 0.15);
+        color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+
+    .nav-links a.active::before {
+        content: '';
+        position: absolute;
+        top: -0.75rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 4px;
+        background: var(--primary-color);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--primary-color);
+    }
+
+    .nav-links a i {
+        font-size: 1.2rem;
+        margin-bottom: 0.1rem;
+    }
+
+    /* Container with proper spacing for bottom header */
+    .container {
+        padding: 2rem 1rem 7rem; /* 7rem bottom padding for mobile header */
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+
+    .hero-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .filter-section {
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .filter-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .view-toggle {
+        align-self: center;
+    }
+
+    .filter-controls {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .gallery-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .gallery-info {
+        justify-content: space-between;
+    }
+
+    .image-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .image-grid.masonry {
+        columns: 2;
+        column-gap: 1rem;
+    }
+
+    .modal-content {
+        max-width: 95%;
+        max-height: 95%;
+        margin: 1rem;
+    }
+
+    .modal-info {
+        padding: 1rem;
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .pagination-btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+    .container {
+        padding: 1.5rem 1rem 7rem;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .filter-section {
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .nav-links {
+        gap: 0;
+        max-width: 100%;
+    }
+
+    .nav-links a {
+        font-size: 0.7rem;
+        min-width: 50px;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .nav-links a i {
+        font-size: 1.1rem;
+    }
+
+    .image-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .image-grid.masonry {
+        columns: 1;
+    }
+
+    .hero-stats {
+        gap: 0.5rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 320px) {
+    .container {
+        padding: 1rem 0.5rem 7rem;
+    }
+
+    .nav-links a {
+        font-size: 0.65rem;
+        min-width: 45px;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .filter-section {
+        padding: 0.75rem;
+    }
+
+    .hero h1 {
+        font-size: 1.75rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-in-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Prevent horizontal scroll on small screens */
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+    .header {
+        -webkit-backdrop-filter: blur(20px);
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding-bottom: calc(7rem + env(safe-area-inset-bottom));
+        }
+        
+        .header {
+            padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+        }
+    }
+}
+
+/* Additional mobile enhancements */
+@media (max-width: 768px) {
+    /* Better touch targets */
+    .nav-links a {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Improved visual feedback */
+    .nav-links a:active {
+        transform: scale(0.95);
+    }
+    
+    /* Better spacing for mobile navigation */
+    .header {
+        padding: 0.5rem 1rem;
+    }
+    
+    .nav-links {
+        padding: 0 0.5rem;
+    }
+}
+
+/* Dark mode optimizations for mobile */
+@media (max-width: 768px) and (prefers-color-scheme: dark) {
+    .header {
+        background: rgba(15, 15, 35, 0.98);
+        border-top: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    .nav-links a.active {
+        background: rgba(99, 102, 241, 0.2);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <i class="fas fa-magic"></i>
+                AI Image Generator
+            </a>
+            <nav class="nav-links">
+                <a href="/"><i class="fas fa-home"></i> Home</a>
+                <a href="/gallery" class="active"><i class="fas fa-images"></i> Gallery</a>
+                <a href="https://wa.me/9230137667318" target="_blank">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="green" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.52 3.48A11.84 11.84 0 0 0 12 0C5.37 0 0 5.37 0 12a11.9 11.9 0 0 0 1.64 6L0 24l6.26-1.64A11.86 11.86 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.18-1.24-6.16-3.48-8.52zM12 22c-1.77 0-3.5-.48-5.01-1.38l-.36-.22-3.72.97.99-3.63-.24-.37C2.52 15.5 2 13.79 2 12 2 6.48 6.48 2 12 2c2.68 0 5.2 1.04 7.07 2.93C21.96 6.8 23 9.32 23 12c0 5.52-4.48 10-10 10zm5.26-7.64l-1.84-.48a1 1 0 0 0-1 .26l-.48.5a8.2 8.2 0 0 1-3.9-3.9l.5-.48a1 1 0 0 0 .26-1l-.48-1.84a1 1 0 0 0-.94-.7H8.01a1 1 0 0 0-1 1c0 5.52 4.48 10 10 10a1 1 0 0 0 1-1v-1.42a1 1 0 0 0-.75-.98z"/>
+                    </svg>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="hero">
+            <h1>AI Image Gallery</h1>
+            <p>Explore a curated collection of stunning AI-generated images. Browse through various styles, categories, and artistic creations powered by advanced AI technology.</p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalImages">2,847</div>
+                    <div class="stat-label">Total Images</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="weeklyImages">156</div>
+                    <div class="stat-label">This Week</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="categories">12</div>
+                    <div class="stat-label">Categories</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="filter-section">
+            <div class="filter-header">
+                <h2 class="filter-title">Filter & Search</h2>
+                <div class="view-toggle">
+                    <button class="view-btn active" id="gridView">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button class="view-btn" id="masonryView">
+                        <i class="fas fa-th"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label class="filter-label">Style</label>
+                    <select id="styleFilter" class="filter-select">
+                        <option value="">All Styles</option>
+                        <option value="realistic">Realistic</option>
+                        <option value="anime">Anime</option>
+                        <option value="digital-art">Digital Art</option>
+                        <option value="3d">3D Render</option>
+                        <option value="cinematic">Cinematic</option>
+                        <option value="fantasy">Fantasy</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Category</label>
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="portrait">Portrait</option>
+                        <option value="landscape">Landscape</option>
+                        <option value="abstract">Abstract</option>
+                        <option value="animal">Animal</option>
+                        <option value="architecture">Architecture</option>
+                        <option value="fantasy">Fantasy</option>
+                        <option value="sci-fi">Sci-Fi</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Quality</label>
+                    <select id="qualityFilter" class="filter-select">
+                        <option value="">All Quality</option>
+                        <option value="standard">Standard</option>
+                        <option value="high">High Quality</option>
+                        <option value="ultra">Ultra HD</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Search</label>
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchInput" disabled class="search-input" placeholder="Search images...">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="gallery-section">
+            <div class="gallery-header">
+                <h2 class="gallery-title">Featured Images</h2>
+                <div class="gallery-info">
+                    <span id="imageCount">Loading...</span>
+                    <select id="sortBy" class="sort-dropdown">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="popular">Most Popular</option>
+                        <option value="random">Random</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="image-grid" id="imageGrid">
+                <!-- Images will be loaded here -->
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading images...</p>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <!-- Pagination will be generated here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <img class="modal-image" id="modalImage" alt="Full size image">
+            <div class="modal-info">
+                <p id="modalPrompt"></p>
+                <div class="modal-actions">
+                    <div>
+                        <button class="btn btn-primary" onclick="downloadImage()">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                        <button class="btn btn-secondary" onclick="shareImage()">
+                            <i class="fas fa-share"></i> Share
+                        </button>
+                    </div>
+                    <button class="favorite-btn" id="modalFavorite">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <script>
+        // AI Image Gallery JavaScript
+class ImageGallery {
+    constructor() {
+        this.images = [];
+        this.filteredImages = [];
+        this.currentPage = 1;
+        this.imagesPerPage = 12;
+        this.currentSort = 'newest';
+        this.currentView = 'grid';
+        this.favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        this.currentModal = null;
+        
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+        this.loadImages();
+        this.updateStats();
+    }
+
+    setupEventListeners() {
+        // View toggle buttons
+        document.getElementById('gridView').addEventListener('click', () => this.setView('grid'));
+        document.getElementById('masonryView').addEventListener('click', () => this.setView('masonry'));
+
+        // Filter controls
+        document.getElementById('styleFilter').addEventListener('change', () => this.applyFilters());
+        document.getElementById('categoryFilter').addEventListener('change', () => this.applyFilters());
+        document.getElementById('qualityFilter').addEventListener('change', () => this.applyFilters());
+        document.getElementById('searchInput').addEventListener('input', () => this.applyFilters());
+
+        // Sort dropdown
+        document.getElementById('sortBy').addEventListener('change', (e) => {
+            this.currentSort = e.target.value;
+            this.applySort();
+        });
+
+        // Modal events
+        document.getElementById('imageModal').addEventListener('click', (e) => {
+            if (e.target.id === 'imageModal') {
+                this.closeModal();
+            }
+        });
+
+        // Keyboard events
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeModal();
+            }
+        });
+
+        // Infinite scroll (optional)
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
+                this.loadMoreImages();
+            }
+        });
+    }
+
+    async loadImages() {
+        try {
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            
+            // Simulate API call or load from server
+            const response = await fetch('/api/gallery-images');
+            if (response.ok) {
+                this.images = await response.json();
+            } else {
+                // Fallback: generate sample data
+                this.images = this.generateSampleImages();
+            }
+            
+            this.filteredImages = [...this.images];
+            this.renderImages();
+            this.updatePagination();
+            
+        } catch (error) {
+            console.error('Error loading images:', error);
+            this.images = this.generateSampleImages();
+            this.filteredImages = [...this.images];
+            this.renderImages();
+            this.updatePagination();
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    generateSampleImages() {
+        const styles = ['realistic', 'anime', 'digital-art', '3d', 'cinematic', 'fantasy'];
+        const categories = ['portrait', 'landscape', 'abstract', 'animal', 'architecture', 'fantasy', 'sci-fi'];
+        const qualities = ['standard', 'high', 'ultra'];
+        
+        const prompts = [
+            'A majestic mountain landscape at sunset with golden light',
+            'Cyberpunk cityscape with neon lights and flying cars',
+            'Beautiful portrait of a woman with flowing hair',
+            'Mystical forest with glowing mushrooms and magical creatures',
+            'Futuristic robot in a post-apocalyptic wasteland',
+            'Serene lake reflecting the night sky with stars',
+            'Abstract geometric patterns in vibrant colors',
+            'Medieval castle on a cliff overlooking the ocean',
+            'Cute anime character in a magical garden',
+            'Steampunk airship floating above the clouds'
+        ];
+
+        return Array.from({ length: 50 }, (_, i) => ({
+            id: `image_${i + 1}`,
+            url: `https://picsum.photos/400/600?random=${i + 1}`,
+            prompt: prompts[i % prompts.length],
+            style: styles[Math.floor(Math.random() * styles.length)],
+            category: categories[Math.floor(Math.random() * categories.length)],
+            quality: qualities[Math.floor(Math.random() * qualities.length)],
+            createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
+            views: Math.floor(Math.random() * 1000) + 10,
+            likes: Math.floor(Math.random() * 100) + 1,
+            tags: this.generateTags()
+        }));
+    }
+
+    generateTags() {
+        const allTags = ['art', 'digital', 'fantasy', 'nature', 'portrait', 'landscape', 'abstract', 'colorful', 'dark', 'bright', 'detailed', 'minimalist'];
+        const numTags = Math.floor(Math.random() * 4) + 2;
+        return Array.from({ length: numTags }, () => allTags[Math.floor(Math.random() * allTags.length)])
+            .filter((tag, index, arr) => arr.indexOf(tag) === index);
+    }
+
+    setView(view) {
+        this.currentView = view;
+        
+        // Update button states
+        document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`${view}View`).classList.add('active');
+        
+        // Update grid class
+        const grid = document.getElementById('imageGrid');
+        grid.className = 'image-grid';
+        if (view === 'masonry') {
+            grid.classList.add('masonry');
+        }
+        
+        this.renderImages();
+    }
+
+    applyFilters() {
+        const styleFilter = document.getElementById('styleFilter').value;
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        const qualityFilter = document.getElementById('qualityFilter').value;
+        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+
+        this.filteredImages = this.images.filter(image => {
+            const matchesStyle = !styleFilter || image.style === styleFilter;
+            const matchesCategory = !categoryFilter || image.category === categoryFilter;
+            const matchesQuality = !qualityFilter || image.quality === qualityFilter;
+            const matchesSearch = !searchQuery || 
+                image.prompt.toLowerCase().includes(searchQuery) ||
+                image.tags.some(tag => tag.toLowerCase().includes(searchQuery));
+
+            return matchesStyle && matchesCategory && matchesQuality && matchesSearch;
+        });
+
+        this.currentPage = 1;
+        this.applySort();
+    }
+
+    applySort() {
+        switch (this.currentSort) {
+            case 'newest':
+                this.filteredImages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                break;
+            case 'oldest':
+                this.filteredImages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                break;
+            case 'popular':
+                this.filteredImages.sort((a, b) => b.views - a.views);
+                break;
+            case 'random':
+                this.filteredImages.sort(() => Math.random() - 0.5);
+                break;
+        }
+
+        this.renderImages();
+        this.updatePagination();
+    }
+
+    renderImages() {
+        const grid = document.getElementById('imageGrid');
+        const startIndex = (this.currentPage - 1) * this.imagesPerPage;
+        const endIndex = startIndex + this.imagesPerPage;
+        const imagesToShow = this.filteredImages.slice(startIndex, endIndex);
+
+        grid.innerHTML = imagesToShow.map(image => this.createImageCard(image)).join('');
+        
+        // Update image count
+        document.getElementById('imageCount').textContent = `${this.filteredImages.length} images`;
+        
+        // Add event listeners to new cards
+        this.attachImageEvents();
+    }
+
+    createImageCard(image) {
+        const isFavorited = this.favorites.includes(image.id);
+        const aspectRatio = this.currentView === 'grid' ? 'square' : '';
+        
+        return `
+            <div class="image-card fade-in" data-id="${image.id}">
+                <div class="image-container ${aspectRatio}">
+                    <img src="${image.url}" alt="${image.prompt}" class="generated-image" loading="lazy">
+                    <div class="image-overlay">
+                        <div class="image-actions">
+                            <button class="action-btn" onclick="gallery.downloadImage('${image.id}')" title="Download">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="action-btn" onclick="gallery.shareImage('${image.id}')" title="Share">
+                                <i class="fas fa-share"></i>
+                            </button>
+                            <button class="action-btn" onclick="gallery.toggleFavorite('${image.id}')" title="Favorite">
+                                <i class="fas fa-heart ${isFavorited ? 'favorited' : ''}"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-info">
+                    <p class="image-prompt">${image.prompt}</p>
+                    <div class="image-meta">
+                        <span>${image.style}</span>
+                        <span>${image.views} views</span>
+                    </div>
+                    <div class="image-tags">
+                        ${image.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    attachImageEvents() {
+        // Add click events to image cards
+        document.querySelectorAll('.image-card').forEach(card => {
+            const img = card.querySelector('.generated-image');
+            img.addEventListener('click', () => {
+                const imageId = card.dataset.id;
+                this.openModal(imageId);
+            });
+        });
+    }
+
+    openModal(imageId) {
+        const image = this.images.find(img => img.id === imageId);
+        if (!image) return;
+
+        this.currentModal = image;
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalPrompt = document.getElementById('modalPrompt');
+        const modalFavorite = document.getElementById('modalFavorite');
+
+        modalImage.src = image.url;
+        modalImage.alt = image.prompt;
+        modalPrompt.textContent = image.prompt;
+        
+        const isFavorited = this.favorites.includes(image.id);
+        modalFavorite.innerHTML = `<i class="fas fa-heart ${isFavorited ? 'favorited' : ''}"></i>`;
+        
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        this.currentModal = null;
+    }
+
+    downloadImage(imageId) {
+        const image = this.images.find(img => img.id === imageId);
+        if (!image) return;
+
+        // Create download link
+        const link = document.createElement('a');
+        link.href = image.url;
+        link.download = `ai-image-${image.id}.png`;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    async shareImage(imageId) {
+        const image = this.images.find(img => img.id === imageId);
+        if (!image) return;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'AI Generated Image',
+                    text: image.prompt,
+                    url: window.location.href
+                });
+            } catch (err) {
+                console.log('Error sharing:', err);
+                this.copyToClipboard(window.location.href);
+            }
+        } else {
+            this.copyToClipboard(window.location.href);
+        }
+    }
+
+    copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            this.showNotification('Link copied to clipboard!');
+        });
+    }
+
+    toggleFavorite(imageId) {
+        const index = this.favorites.indexOf(imageId);
+        if (index > -1) {
+            this.favorites.splice(index, 1);
+        } else {
+            this.favorites.push(imageId);
+        }
+        
+        localStorage.setItem('favorites', JSON.stringify(this.favorites));
+        this.renderImages(); // Re-render to update favorite icons
+        
+        // Update modal favorite button if open
+        if (this.currentModal && this.currentModal.id === imageId) {
+            const modalFavorite = document.getElementById('modalFavorite');
+            const isFavorited = this.favorites.includes(imageId);
+            modalFavorite.innerHTML = `<i class="fas fa-heart ${isFavorited ? 'favorited' : ''}"></i>`;
+        }
+    }
+
+    updatePagination() {
+        const totalPages = Math.ceil(this.filteredImages.length / this.imagesPerPage);
+        const pagination = document.getElementById('pagination');
+        
+        if (totalPages <= 1) {
+            pagination.style.display = 'none';
+            return;
+        }
+        
+        pagination.style.display = 'flex';
+        
+        let paginationHTML = '';
+        
+        // Previous button
+        paginationHTML += `
+            <button class="pagination-btn" ${this.currentPage === 1 ? 'disabled' : ''} 
+                    onclick="gallery.goToPage(${this.currentPage - 1})">
+                <i class="fas fa-chevron-left"></i> Previous
+            </button>
+        `;
+        
+        // Page numbers
+        const startPage = Math.max(1, this.currentPage - 2);
+        const endPage = Math.min(totalPages, this.currentPage + 2);
+        
+        if (startPage > 1) {
+            paginationHTML += `<button class="pagination-btn" onclick="gallery.goToPage(1)">1</button>`;
+            if (startPage > 2) {
+                paginationHTML += `<span class="pagination-ellipsis">...</span>`;
+            }
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `
+                <button class="pagination-btn ${i === this.currentPage ? 'active' : ''}" 
+                        onclick="gallery.goToPage(${i})">${i}</button>
+            `;
+        }
+        
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                paginationHTML += `<span class="pagination-ellipsis">...</span>`;
+            }
+            paginationHTML += `<button class="pagination-btn" onclick="gallery.goToPage(${totalPages})">${totalPages}</button>`;
+        }
+        
+        // Next button
+        paginationHTML += `
+            <button class="pagination-btn" ${this.currentPage === totalPages ? 'disabled' : ''} 
+                    onclick="gallery.goToPage(${this.currentPage + 1})">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
+        `;
+        
+        pagination.innerHTML = paginationHTML;
+    }
+
+    goToPage(page) {
+        const totalPages = Math.ceil(this.filteredImages.length / this.imagesPerPage);
+        if (page < 1 || page > totalPages) return;
+        
+        this.currentPage = page;
+        this.renderImages();
+        this.updatePagination();
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    loadMoreImages() {
+        // For infinite scroll functionality
+        const totalPages = Math.ceil(this.filteredImages.length / this.imagesPerPage);
+        if (this.currentPage < totalPages) {
+            this.currentPage++;
+            this.appendImages();
+        }
+    }
+
+    appendImages() {
+        const grid = document.getElementById('imageGrid');
+        const startIndex = (this.currentPage - 1) * this.imagesPerPage;
+        const endIndex = startIndex + this.imagesPerPage;
+        const imagesToShow = this.filteredImages.slice(startIndex, endIndex);
+
+        const newImagesHTML = imagesToShow.map(image => this.createImageCard(image)).join('');
+        grid.insertAdjacentHTML('beforeend', newImagesHTML);
+        
+        this.attachImageEvents();
+    }
+
+    updateStats() {
+        // Update hero statistics
+        document.getElementById('totalImages').textContent = this.images.length.toLocaleString();
+        
+        // Calculate weekly images (images from last 7 days)
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        const weeklyImages = this.images.filter(img => new Date(img.createdAt) > weekAgo).length;
+        document.getElementById('weeklyImages').textContent = weeklyImages.toString();
+        
+        // Count unique categories
+        const categories = new Set(this.images.map(img => img.category));
+        document.getElementById('categories').textContent = categories.size.toString();
+    }
+
+    showNotification(message) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+}
+
+// Global functions for inline event handlers
+function closeModal() {
+    if (window.gallery) {
+        window.gallery.closeModal();
+    }
+}
+
+function downloadImage() {
+    if (window.gallery && window.gallery.currentModal) {
+        window.gallery.downloadImage(window.gallery.currentModal.id);
+    }
+}
+
+function shareImage() {
+    if (window.gallery && window.gallery.currentModal) {
+        window.gallery.shareImage(window.gallery.currentModal.id);
+    }
+}
+
+// Initialize gallery when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.gallery = new ImageGallery();
+});
+
+// Add CSS for notification animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+    
+    .pagination-ellipsis {
+        display: flex;
+        align-items: center;
+        padding: 0 0.5rem;
+        color: var(--text-muted);
+    }
+`;
+document.head.appendChild(style);
+    </script>
+
+
+
+</body>
+</html>

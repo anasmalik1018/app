@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator - Create Stunning Images with Voice</title>
+    <meta name="description" content="Advanced AI-powered image generator with voice commands. Create stunning, high-quality images using text prompts or voice input.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+
+    <style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary-color: #f59e0b;
+    --accent-color: #10b981;
+    --background-color: #0f0f23;
+    --surface-color: #1a1a2e;
+    --surface-light: #252545;
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+    --border-color: #374151;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --gradient-secondary: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    --gradient-accent: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--background-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Background Animation */
+.bg-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.1;
+}
+
+.bg-animation::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 25% 25%, #6366f1 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #8b5cf6 0%, transparent 50%);
+    animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+/* Header - Desktop */
+.header {
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 1rem 0;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+}
+
+.logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.logo i {
+    font-size: 1.8rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+}
+
+.nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--primary-color);
+}
+
+/* Main Container */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 8rem 2rem 2rem;
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* Generator Section */
+.generator {
+    background: var(--surface-color);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-xl);
+}
+
+.generator-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.generator-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.voice-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--surface-light);
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.voice-toggle:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.voice-toggle.active {
+    background: var(--accent-color);
+    box-shadow: var(--shadow-glow);
+}
+
+/* Input Section */
+.input-section {
+    margin-bottom: 2rem;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.prompt-input {
+    width: 100%;
+    padding: 1rem;
+    background: var(--surface-light);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.prompt-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.voice-input-section {
+    display: none;
+    background: var(--surface-light);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 2px dashed var(--border-color);
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.voice-input-section.active {
+    display: block;
+    border-color: var(--accent-color);
+}
+
+.voice-button {
+    background: var(--gradient-accent);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 auto;
+}
+
+.voice-button:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.voice-button.listening {
+    background: var(--gradient-secondary);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Advanced Options */
+.advanced-options {
+    background: var(--surface-light);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.advanced-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.advanced-content {
+    display: none;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.advanced-content.active {
+    display: grid;
+}
+
+.option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.select-input, .number-input {
+    padding: 0.75rem;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.select-input:focus, .number-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkbox-input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+
+/* Generate Button */
+.generate-section {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.generate-btn {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 200px;
+    justify-content: center;
+}
+
+.generate-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-xl);
+}
+
+.generate-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.enhance-btn {
+    background: var(--gradient-secondary);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.enhance-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Loading Animation */
+.loading {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+    background: var(--surface-light);
+    border-radius: 12px;
+    margin: 2rem 0;
+}
+
+.loading.active {
+    display: block;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--border-color);
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Results Section */
+.results {
+    margin-top: 3rem;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.results-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.results-stats {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Image Grid - Desktop */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.image-card {
+    background: var(--surface-color);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.image-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.image-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+}
+
+.generated-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    display: block;
+}
+
+.generated-image:hover {
+    transform: scale(1.05);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-card:hover .image-overlay {
+    opacity: 1;
+}
+
+.image-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: none;
+    padding: 0.75rem;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.action-btn:hover {
+    background: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.image-info {
+    padding: 1rem;
+}
+
+.image-prompt {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.image-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Status Messages */
+.status-message {
+    padding: 1rem;
+    border-radius: 10px;
+    margin: 1rem 0;
+    display: none;
+}
+
+.status-message.success {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--success-color);
+    color: var(--success-color);
+}
+
+.status-message.error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--error-color);
+    color: var(--error-color);
+}
+
+.status-message.warning {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid var(--warning-color);
+    color: var(--warning-color);
+}
+
+/* Audio Player */
+.audio-player {
+    background: var(--surface-light);
+    border-radius: 10px;
+    padding: 1rem;
+    margin: 1rem 0;
+    display: none;
+    align-items: center;
+    gap: 1rem;
+}
+
+.audio-player.active {
+    display: flex;
+}
+
+.play-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.play-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.1);
+}
+
+.audio-info {
+    flex: 1;
+}
+
+.audio-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.audio-duration {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-in-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Filter Section */
+.filter-section {
+    background: var(--surface-color);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.filter-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.filter-select {
+    padding: 0.75rem;
+    background: var(--surface-light);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    /* Mobile Header - Bottom Navigation */
+    .header {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.75rem 0;
+        background: rgba(26, 26, 46, 0.98);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid var(--border-color);
+        border-bottom: none;
+        box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+    }
+
+    .header-content {
+        padding: 0 1rem;
+        justify-content: center;
+        max-width: 100%;
+    }
+
+    .logo {
+        display: none;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 0;
+        justify-content: space-around;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        list-style: none;
+    }
+
+    .nav-links a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        position: relative;
+        min-width: 60px;
+        text-align: center;
+        color: var(--text-secondary);
+        text-decoration: none;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+        background: rgba(99, 102, 241, 0.15);
+        color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+
+    .nav-links a.active::before {
+        content: '';
+        position: absolute;
+        top: -0.75rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 4px;
+        background: var(--primary-color);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--primary-color);
+    }
+
+    .nav-links a i {
+        font-size: 1.2rem;
+        margin-bottom: 0.1rem;
+    }
+
+    /* Mobile Container */
+    .container {
+        padding: 2rem 1rem 8rem;
+    }
+
+    /* Mobile Hero */
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+
+    .hero-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    /* Mobile Generator */
+    .generator {
+        padding: 1.5rem;
+    }
+
+    .generator-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .generate-section {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .generate-btn {
+        width: 100%;
+        min-width: auto;
+    }
+
+    /* Mobile Image Grid */
+    .image-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .image-card {
+        max-width: 100%;
+    }
+
+    .image-card:hover {
+        transform: none;
+    }
+
+    .generated-image:hover {
+        transform: none;
+    }
+
+    .image-overlay {
+        display: none;
+    }
+
+    /* Mobile Advanced Options */
+    .advanced-content {
+        grid-template-columns: 1fr;
+    }
+
+    /* Mobile Filter */
+    .filter-section {
+        padding: 1.5rem;
+    }
+
+    .filter-controls {
+        grid-template-columns: 1fr;
+    }
+
+    /* Body padding for bottom navigation */
+    body {
+        padding-bottom: 80px;
+    }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+    .container {
+        padding: 1.5rem 1rem 8rem;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .nav-links a {
+        font-size: 0.7rem;
+        min-width: 50px;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .nav-links a i {
+        font-size: 1.1rem;
+    }
+
+    .hero-stats {
+        gap: 0.5rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
+    .generator {
+        padding: 1rem;
+    }
+
+    .filter-section {
+        padding: 1rem;
+    }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 320px) {
+    .container {
+        padding: 1rem 0.5rem 8rem;
+    }
+
+    .nav-links a {
+        font-size: 0.65rem;
+        min-width: 45px;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .hero h1 {
+        font-size: 1.75rem;
+    }
+
+    .generator {
+        padding: 0.75rem;
+    }
+
+    .filter-section {
+        padding: 0.75rem;
+    }
+}
+
+/* Dark mode optimizations for mobile */
+@media (max-width: 768px) and (prefers-color-scheme: dark) {
+    .header {
+        background: rgba(15, 15, 35, 0.98);
+        border-top: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    .nav-links a.active {
+        background: rgba(99, 102, 241, 0.2);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+    }
+}
+
+/* Ensure proper image loading */
+.generated-image {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Touch improvements for mobile */
+@media (hover: none) and (pointer: coarse) {
+    .generate-btn:hover,
+    .enhance-btn:hover,
+    .voice-button:hover,
+    .action-btn:hover {
+        transform: none;
+    }
+
+    .image-card:hover {
+        transform: none;
+        box-shadow: var(--shadow-md);
+    }
+}
+</style>
+<body>
+
+
+
+
+
+
+
+    <div class="bg-animation"></div>
+    
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-magic"></i>
+                AI Image Generator
+            </div>
+            <nav class="nav-links">
+<a href="#home" data-page="home">
+        <i class="fas fa-home"></i>
+        Home
+    </a>                <a href="/gallery"><i class="fas fa-images"></i> Gallery</a>
+
+<a href="https://wa.me/9230137667318" target="_blank">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="green" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20.52 3.48A11.84 11.84 0 0 0 12 0C5.37 0 0 5.37 0 12a11.9 11.9 0 0 0 1.64 6L0 24l6.26-1.64A11.86 11.86 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.18-1.24-6.16-3.48-8.52zM12 22c-1.77 0-3.5-.48-5.01-1.38l-.36-.22-3.72.97.99-3.63-.24-.37C2.52 15.5 2 13.79 2 12 2 6.48 6.48 2 12 2c2.68 0 5.2 1.04 7.07 2.93C21.96 6.8 23 9.32 23 12c0 5.52-4.48 10-10 10zm5.26-7.64l-1.84-.48a1 1 0 0 0-1 .26l-.48.5a8.2 8.2 0 0 1-3.9-3.9l.5-.48a1 1 0 0 0 .26-1l-.48-1.84a1 1 0 0 0-.94-.7H8.01a1 1 0 0 0-1 1c0 5.52 4.48 10 10 10a1 1 0 0 0 1-1v-1.42a1 1 0 0 0-.75-.98z"/>
+  </svg>
+</a>
+
+
+
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="hero" id="home">
+            <h1>AI Image Generator</h1>
+            <h1>Create Stunning AI Images</h1>
+            <p>Transform your ideas into beautiful, high-quality images using advanced AI technology. Support for voice commands and multiple generation styles.</p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalGenerations">0</div>
+                    <div class="stat-label">Images Generated</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="recentGenerations">0</div>
+                    <div class="stat-label">This Week</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="voiceEnabled">🎤</div>
+                    <div class="stat-label">Voice Enabled</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="generator" id="generator">
+            <div class="generator-header">
+                <h2 class="generator-title">AI Image Generator</h2>
+                <div class="voice-toggle" id="voiceToggle">
+                    <i class="fas fa-microphone"></i>
+                    <span>Voice Mode</span>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="input-group">
+                    <label class="input-label" for="promptInput">Describe your image</label>
+                    <textarea 
+                        id="promptInput" 
+                        class="prompt-input" 
+                        placeholder="Describe the image you want to generate... (e.g., 'A futuristic cityscape at sunset with flying cars')"
+                        maxlength="500"
+                    ></textarea>
+                </div>
+
+                <div class="voice-input-section" id="voiceInputSection">
+                    <h3>🎤 Voice Input</h3>
+                    <p>Click the button below and speak your image description</p>
+                    <button class="voice-button" id="voiceButton">
+                        <i class="fas fa-microphone"></i>
+                        <span>Start Recording</span>
+                    </button>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label" for="negativePrompt">Negative Prompt (Optional)</label>
+                    <textarea 
+                        id="negativePrompt" 
+                        class="prompt-input" 
+                        placeholder="Describe what you don't want in the image... (e.g., 'blurry, low quality, distorted')"
+                        style="min-height: 80px;"
+                        maxlength="300"
+                    ></textarea>
+                </div>
+            </div>
+
+            <div class="advanced-options">
+                <div class="advanced-toggle" id="advancedToggle">
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Advanced Options</span>
+                </div>
+                <div class="advanced-content" id="advancedContent">
+                    <div class="option-group">
+                        <label class="input-label">Style</label>
+                        <select id="styleSelect" class="select-input">
+                            <option value="auto">Auto</option>
+                            <option value="realistic">Realistic</option>
+                            <option value="anime">Anime</option>
+                            <option value="digital-art">Digital Art</option>
+                            <option value="3d">3D Render</option>
+                            <option value="cinematic">Cinematic</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label class="input-label">Model</label>
+                        <select id="modelSelect" class="select-input">
+                            <option value="flux">Flux (Recommended)</option>
+                            <option value="stable-diffusion">Stable Diffusion</option>
+                            <option value="midjourney">Midjourney Style</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label class="input-label">Quality</label>
+                        <select id="qualitySelect" class="select-input">
+                            <option value="standard">Standard</option>
+                            <option value="high">High Quality</option>
+                            <option value="ultra">Ultra HD</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label class="input-label">Image Size</label>
+                        <select id="sizeSelect" class="select-input">
+                            <option value="1024x1024">Square (1024x1024)</option>
+                            <option value="1024x768">Landscape (1024x768)</option>
+                            <option value="768x1024">Portrait (768x1024)</option>
+                            <option value="1920x1080">HD (1920x1080)</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label class="input-label">Number of Images</label>
+                        <select id="numImagesSelect" class="select-input">
+                            <option value="1">1 Image</option>
+                            <option value="2">2 Images</option>
+                            <option value="3">3 Images</option>
+                            <option value="4">4 Images</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label class="input-label">Seed (Optional)</label>
+                        <input id="seedInput" type="number" class="number-input" placeholder="Random seed">
+                    </div>
+                    <div class="option-group">
+                        <div class="checkbox-group">
+                            <input id="enhancePrompt" type="checkbox" class="checkbox-input" checked>
+                            <label for="enhancePrompt" class="input-label">Enhance Prompt</label>
+                        </div>
+                    </div>
+                    <div class="option-group">
+                        <div class="checkbox-group">
+                            <input id="removeWatermark" type="checkbox" class="checkbox-input" checked>
+                            <label for="removeWatermark" class="input-label">Remove Watermark</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="generate-section">
+                <button class="enhance-btn" id="enhanceBtn">
+                    <i class="fas fa-magic"></i>
+                    <span>Enhance Prompt</span>
+                </button>
+                <button class="generate-btn" id="generateBtn">
+                    <i class="fas fa-rocket"></i>
+                    <span>Generate Images</span>
+                </button>
+            </div>
+        </section>
+
+        <div class="status-message" id="statusMessage"></div>
+        
+        <div class="audio-player" id="audioPlayer">
+            <button class="play-btn" id="playBtn">
+                <i class="fas fa-play"></i>
+            </button>
+            <div class="audio-info">
+                <div class="audio-title">Voice Response</div>
+                <div class="audio-duration">Click to play</div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <h3>Generating your images...</h3>
+            <p>This may take a few moments. Please wait.</p>
+        </div>
+
+        <section class="results" id="results" style="display: none;">
+            <div class="results-header">
+                <h2 class="results-title">Generated Images</h2>
+                <div class="results-stats">
+                    <span id="resultsCount">0 images</span>
+                    <span id="resultsTime">0s</span>
+                </div>
+            </div>
+            <div class="image-grid" id="imageGrid"></div>
+        </section>
+    </div>
+
+
+
+
+
+
+<script>
+
+// AI Image Generator JavaScript
+class AIImageGenerator {
+    constructor() {
+        this.apiUrl = '/api';
+        this.voiceEnabled = false;
+        this.isListening = false;
+        this.isGenerating = false;
+        this.currentAudio = null;
+        this.mediaRecorder = null;
+        this.audioChunks = [];
+        
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+        this.loadStats();
+        this.checkVoiceSupport();
+    }
+
+    setupEventListeners() {
+        // Advanced options toggle
+        const advancedToggle = document.getElementById('advancedToggle');
+        const advancedContent = document.getElementById('advancedContent');
+        
+        if (advancedToggle) {
+            advancedToggle.addEventListener('click', () => {
+                const isExpanded = advancedContent.style.display === 'block';
+                advancedContent.style.display = isExpanded ? 'none' : 'block';
+                
+                const icon = advancedToggle.querySelector('i');
+                icon.className = isExpanded ? 'fas fa-chevron-right' : 'fas fa-chevron-down';
+            });
+        }
+
+        // Voice toggle
+        const voiceToggle = document.getElementById('voiceToggle');
+        if (voiceToggle) {
+            voiceToggle.addEventListener('click', () => {
+                this.toggleVoiceMode();
+            });
+        }
+
+        // Voice button
+        const voiceButton = document.getElementById('voiceButton');
+        if (voiceButton) {
+            voiceButton.addEventListener('click', () => {
+                this.handleVoiceInput();
+            });
+        }
+
+        // Generate button
+        const generateBtn = document.getElementById('generateBtn');
+        if (generateBtn) {
+            generateBtn.addEventListener('click', () => {
+                this.generateImages();
+            });
+        }
+
+        // Enhance button
+        const enhanceBtn = document.getElementById('enhanceBtn');
+        if (enhanceBtn) {
+            enhanceBtn.addEventListener('click', () => {
+                this.enhancePrompt();
+            });
+        }
+
+        // Audio player
+        const playBtn = document.getElementById('playBtn');
+        if (playBtn) {
+            playBtn.addEventListener('click', () => {
+                this.playAudio();
+            });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                this.generateImages();
+            }
+            if (e.ctrlKey && e.key === 'Space') {
+                e.preventDefault();
+                this.handleVoiceInput();
+            }
+        });
+    }
+
+    async checkVoiceSupport() {
+        try {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                this.voiceEnabled = true;
+                this.updateVoiceStatus();
+            } else {
+                console.log('Speech recognition not supported');
+                this.hideVoiceFeatures();
+            }
+        } catch (error) {
+            console.error('Voice support check failed:', error);
+            this.hideVoiceFeatures();
+        }
+    }
+
+    toggleVoiceMode() {
+        const voiceSection = document.getElementById('voiceInputSection');
+        const voiceToggle = document.getElementById('voiceToggle');
+        
+        if (voiceSection && voiceToggle) {
+            const isVisible = voiceSection.style.display === 'block';
+            voiceSection.style.display = isVisible ? 'none' : 'block';
+            voiceToggle.classList.toggle('active', !isVisible);
+        }
+    }
+
+    hideVoiceFeatures() {
+        const voiceElements = [
+            'voiceToggle',
+            'voiceInputSection',
+            'audioPlayer'
+        ];
+        
+        voiceElements.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.style.display = 'none';
+            }
+        });
+    }
+
+    updateVoiceStatus() {
+        const voiceStatus = document.getElementById('voiceEnabled');
+        if (voiceStatus) {
+            voiceStatus.textContent = this.voiceEnabled ? '🎤' : '❌';
+        }
+    }
+
+    async handleVoiceInput() {
+        if (this.isListening) {
+            this.stopListening();
+            return;
+        }
+
+        try {
+            this.startListening();
+            const result = await this.listenToVoice();
+            
+            if (result.success) {
+                const promptInput = document.getElementById('promptInput');
+                if (promptInput) {
+                    promptInput.value = result.text;
+                }
+                
+                this.showStatus('Voice input received: ' + result.text, 'success');
+                
+                // Play audio response if available
+                if (result.audio_response) {
+                    this.playAudioResponse(result.audio_response);
+                }
+            } else {
+                this.showStatus('Voice recognition failed: ' + result.error, 'error');
+            }
+        } catch (error) {
+            this.showStatus('Voice input error: ' + error.message, 'error');
+        } finally {
+            this.stopListening();
+        }
+    }
+
+    startListening() {
+        this.isListening = true;
+        const voiceButton = document.getElementById('voiceButton');
+        
+        if (voiceButton) {
+            voiceButton.innerHTML = '<i class="fas fa-stop"></i><span>Stop Recording</span>';
+            voiceButton.classList.add('recording');
+        }
+        
+        this.showStatus('Listening... Speak now!', 'info');
+    }
+
+    stopListening() {
+        this.isListening = false;
+        const voiceButton = document.getElementById('voiceButton');
+        
+        if (voiceButton) {
+            voiceButton.innerHTML = '<i class="fas fa-microphone"></i><span>Start Recording</span>';
+            voiceButton.classList.remove('recording');
+        }
+    }
+
+    async listenToVoice() {
+        return new Promise((resolve, reject) => {
+            try {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    resolve({ success: true, text: transcript });
+                };
+                
+                recognition.onerror = (event) => {
+                    resolve({ success: false, error: event.error });
+                };
+                
+                recognition.onend = () => {
+                    this.stopListening();
+                };
+                
+                recognition.start();
+                
+                // Timeout after 10 seconds
+                setTimeout(() => {
+                    recognition.stop();
+                    if (this.isListening) {
+                        resolve({ success: false, error: 'Timeout' });
+                    }
+                }, 10000);
+                
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    async enhancePrompt() {
+        const promptInput = document.getElementById('promptInput');
+        const enhanceBtn = document.getElementById('enhanceBtn');
+        
+        if (!promptInput || !promptInput.value.trim()) {
+            this.showStatus('Please enter a prompt first', 'error');
+            return;
+        }
+
+        const originalText = enhanceBtn.innerHTML;
+        enhanceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Enhancing...</span>';
+        enhanceBtn.disabled = true;
+
+        try {
+            const response = await fetch(`${this.apiUrl}/enhance-prompt`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    prompt: promptInput.value
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                promptInput.value = data.enhanced_prompt;
+                this.showStatus('Prompt enhanced successfully!', 'success');
+            } else {
+                this.showStatus('Failed to enhance prompt: ' + data.error, 'error');
+            }
+        } catch (error) {
+            this.showStatus('Error enhancing prompt: ' + error.message, 'error');
+        } finally {
+            enhanceBtn.innerHTML = originalText;
+            enhanceBtn.disabled = false;
+        }
+    }
+
+    async generateImages() {
+        if (this.isGenerating) {
+            return;
+        }
+
+        const promptInput = document.getElementById('promptInput');
+        const prompt = promptInput?.value?.trim();
+
+        if (!prompt) {
+            this.showStatus('Please enter a prompt', 'error');
+            return;
+        }
+
+        this.isGenerating = true;
+        this.showLoading(true);
+        this.showStatus('Generating images...', 'info');
+
+        const generateBtn = document.getElementById('generateBtn');
+        const originalText = generateBtn.innerHTML;
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Generating...</span>';
+        generateBtn.disabled = true;
+
+        try {
+            const params = this.getGenerationParams();
+            params.prompt = prompt;
+
+            const response = await fetch(`${this.apiUrl}/generate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(params)
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.images.length > 0) {
+                this.displayResults(data.images);
+                this.showStatus(`Generated ${data.images.length} image(s) successfully!`, 'success');
+                this.updateStats();
+                
+                // Play voice response if available
+                if (data.voice_response) {
+                    this.playAudioResponse(data.voice_response);
+                }
+            } else {
+                this.showStatus('Failed to generate images: ' + (data.error || 'Unknown error'), 'error');
+            }
+        } catch (error) {
+            this.showStatus('Error generating images: ' + error.message, 'error');
+        } finally {
+            this.isGenerating = false;
+            this.showLoading(false);
+            generateBtn.innerHTML = originalText;
+            generateBtn.disabled = false;
+        }
+    }
+
+    getGenerationParams() {
+        const params = {
+            negative_prompt: document.getElementById('negativePrompt')?.value || '',
+            style: document.getElementById('styleSelect')?.value || 'auto',
+            model: document.getElementById('modelSelect')?.value || 'flux',
+            quality: document.getElementById('qualitySelect')?.value || 'standard',
+            num_images: parseInt(document.getElementById('numImagesSelect')?.value || '1'),
+            enhance_prompt: document.getElementById('enhancePrompt')?.checked || false,
+            remove_watermark: document.getElementById('removeWatermark')?.checked || false,
+            voice_response: this.voiceEnabled
+        };
+
+        // Handle size
+        const size = document.getElementById('sizeSelect')?.value || '1024x1024';
+        if (size === 'custom') {
+            params.width = parseInt(document.getElementById('customWidth')?.value || '1024');
+            params.height = parseInt(document.getElementById('customHeight')?.value || '1024');
+        } else {
+            params.size = size;
+        }
+
+        // Handle seed
+        const seed = document.getElementById('seedInput')?.value;
+        if (seed) {
+            params.seed = parseInt(seed);
+        }
+
+        return params;
+    }
+
+    displayResults(images) {
+        const resultsSection = document.getElementById('results');
+        const imageGrid = document.getElementById('imageGrid');
+        const resultsCount = document.getElementById('resultsCount');
+        
+        if (!resultsSection || !imageGrid) return;
+
+        // Clear previous results
+        imageGrid.innerHTML = '';
+
+        // Update results count
+        if (resultsCount) {
+            resultsCount.textContent = `${images.length} image${images.length > 1 ? 's' : ''}`;
+        }
+
+        // Create image elements
+        images.forEach((image, index) => {
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'image-container';
+            
+            imageContainer.innerHTML = `
+                <div class="image-item">
+                    <img src="${image.image_url}" alt="Generated image ${index + 1}" loading="lazy">
+                    <div class="image-overlay">
+                        <div class="image-actions">
+                            <button class="action-btn" onclick="generator.downloadImage('${image.image_id}')">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="action-btn" onclick="generator.shareImage('${image.image_url}')">
+                                <i class="fas fa-share"></i>
+                            </button>
+                            <button class="action-btn" onclick="generator.viewFullscreen('${image.image_url}')">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="image-info">
+                        <small>Seed: ${image.seed}</small>
+                    </div>
+                </div>
+            `;
+            
+            imageGrid.appendChild(imageContainer);
+        });
+
+        // Show results section
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async downloadImage(imageId) {
+        try {
+            const response = await fetch(`${this.apiUrl}/download/${imageId}`);
+            const blob = await response.blob();
+            
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `generated_image_${imageId}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            this.showStatus('Image downloaded successfully!', 'success');
+        } catch (error) {
+            this.showStatus('Error downloading image: ' + error.message, 'error');
+        }
+    }
+
+    shareImage(imageUrl) {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Generated AI Image',
+                text: 'Check out this AI-generated image!',
+                url: imageUrl
+            });
+        } else {
+            // Fallback to clipboard
+            navigator.clipboard.writeText(window.location.origin + imageUrl).then(() => {
+                this.showStatus('Image URL copied to clipboard!', 'success');
+            });
+        }
+    }
+
+    viewFullscreen(imageUrl) {
+        const modal = document.createElement('div');
+        modal.className = 'fullscreen-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                <img src="${imageUrl}" alt="Fullscreen image">
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+
+    playAudioResponse(audioResponse) {
+        if (!audioResponse || !audioResponse.audio_url) return;
+
+        const audioPlayer = document.getElementById('audioPlayer');
+        if (audioPlayer) {
+            audioPlayer.style.display = 'block';
+            
+            // Update audio info
+            const audioTitle = audioPlayer.querySelector('.audio-title');
+            const audioDuration = audioPlayer.querySelector('.audio-duration');
+            
+            if (audioTitle) audioTitle.textContent = 'AI Response';
+            if (audioDuration) audioDuration.textContent = 'Click to play';
+            
+            this.currentAudio = audioResponse.audio_url;
+        }
+    }
+
+    playAudio() {
+        if (!this.currentAudio) return;
+
+        const audio = new Audio(this.currentAudio);
+        const playBtn = document.getElementById('playBtn');
+        
+        if (playBtn) {
+            playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        }
+
+        audio.play().then(() => {
+            if (playBtn) {
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            }
+        }).catch(error => {
+            this.showStatus('Error playing audio: ' + error.message, 'error');
+            if (playBtn) {
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        });
+
+        audio.addEventListener('ended', () => {
+            if (playBtn) {
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        });
+    }
+
+    showLoading(show) {
+        const loading = document.getElementById('loading');
+        if (loading) {
+            loading.style.display = show ? 'block' : 'none';
+        }
+    }
+
+    showStatus(message, type = 'info') {
+        const statusMessage = document.getElementById('statusMessage');
+        if (!statusMessage) return;
+
+        statusMessage.textContent = message;
+        statusMessage.className = `status-message ${type}`;
+        statusMessage.style.display = 'block';
+
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+            statusMessage.style.display = 'none';
+        }, 5000);
+    }
+
+    async loadStats() {
+        try {
+            const response = await fetch(`${this.apiUrl}/stats`);
+            const data = await response.json();
+
+            if (data.success) {
+                this.updateStatsDisplay(data);
+            }
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+    }
+
+    updateStatsDisplay(stats) {
+        const totalGenerations = document.getElementById('totalGenerations');
+        const recentGenerations = document.getElementById('recentGenerations');
+        const voiceEnabled = document.getElementById('voiceEnabled');
+
+        if (totalGenerations) {
+            this.animateNumber(totalGenerations, stats.total_generations || 0);
+        }
+        if (recentGenerations) {
+            this.animateNumber(recentGenerations, stats.recent_generations || 0);
+        }
+        if (voiceEnabled) {
+            voiceEnabled.textContent = stats.voice_enabled ? '🎤' : '❌';
+        }
+    }
+
+    animateNumber(element, target) {
+        const start = parseInt(element.textContent) || 0;
+        const duration = 1000;
+        const step = (target - start) / (duration / 16);
+        let current = start;
+
+        const animate = () => {
+            current += step;
+            element.textContent = Math.round(current);
+            
+            if ((step > 0 && current < target) || (step < 0 && current > target)) {
+                requestAnimationFrame(animate);
+            } else {
+                element.textContent = target;
+            }
+        };
+
+        animate();
+    }
+
+    async updateStats() {
+        await this.loadStats();
+    }
+}
+
+// Initialize the generator when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.generator = new AIImageGenerator();
+});
+
+// Add CSS for dynamic elements
+const style = document.createElement('style');
+style.textContent = `
+    .image-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        transition: transform 0.3s ease;
+    }
+    
+    .image-container:hover {
+        transform: translateY(-5px);
+    }
+    
+    .image-item {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .image-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .image-container:hover .image-overlay {
+        opacity: 1;
+    }
+    
+    .image-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .action-btn {
+        background: rgba(255,255,255,0.2);
+        border: none;
+        color: white;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+    
+    .action-btn:hover {
+        background: rgba(255,255,255,0.3);
+        transform: scale(1.1);
+    }
+    
+    .image-info {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+    }
+    
+    .fullscreen-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    
+    .modal-content {
+        position: relative;
+        max-width: 90%;
+        max-height: 90%;
+    }
+    
+    .modal-content img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    .close {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        color: white;
+        font-size: 30px;
+        cursor: pointer;
+        z-index: 1001;
+    }
+    
+    .status-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        z-index: 1000;
+        max-width: 300px;
+        word-wrap: break-word;
+    }
+    
+    .status-message.success {
+        background: rgba(46, 204, 113, 0.9);
+    }
+    
+    .status-message.error {
+        background: rgba(231, 76, 60, 0.9);
+    }
+    
+    .status-message.info {
+        background: rgba(52, 152, 219, 0.9);
+    }
+    
+    .voice-button.recording {
+        background: #e74c3c !important;
+        animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .voice-toggle.active {
+        background: #27ae60 !important;
+    }
+`;
+
+document.head.appendChild(style);
+
+
+</script>
+
+
+
+<!-- Home active js mobile Responsive -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('.nav-links a');
+    
+    // Home ko default active banayein
+    const homeLink = document.querySelector('.nav-links a[href="#home"]');
+    if (homeLink) {
+        homeLink.classList.add('active', 'nav-active');
+    }
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Sab se active class remove karein
+            navLinks.forEach(l => {
+                l.classList.remove('active', 'nav-active');
+            });
+            
+            // Clicked link ko active banayein
+            this.classList.add('active', 'nav-active');
+        });
+    });
+});
+</script>
+
+<!-- <iframe src="https://malikanas.pythonanywhere.com/" height="400px" width="94%" style="margin-left: 50px; margin-bottom: 30px; margin-right: 50px;"></iframe> -->
+</body>
+</html>

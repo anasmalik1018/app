@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AI Image Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <!-- favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <style>
+        :root {
+            --bg-color: #1a202c;
+            --card-bg: #2d3748;
+            --text-color: #e2e8f0;
+            --accent-color: #4299e1;
+            --danger-color: #f56565;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        
+        .sidebar {
+            background-color: var(--card-bg);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        table {
+            width: 100%;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #4a5568;
+        }
+        
+        th {
+            background-color: #2d3748;
+        }
+        
+        tr:hover {
+            background-color: #4a5568;
+        }
+        
+        .audio-player {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="drawer lg:drawer-open">
+        <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+        
+        <!-- Sidebar -->
+        <div class="drawer-side">
+            <label for="my-drawer" class="drawer-overlay"></label>
+            <div class="sidebar p-4 w-80 min-h-full">
+                <h1 class="text-xl font-bold mb-6">AI Image Generator Admin</h1>
+                
+                <ul class="menu space-y-2">
+                    <li><a href="#" class="active" id="dashboardLink"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="#" id="imagesLink"><i class="fas fa-image"></i> Image Management</a></li>
+                    <li><a href="#" id="audioLink"><i class="fas fa-music"></i> Audio Management</a></li>
+                    <li><a href="#" id="logsLink"><i class="fas fa-clipboard-list"></i> Generation Logs</a></li>
+                    <li><a href="#" id="settingsLink"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#" id="systemLink"><i class="fas fa-server"></i> System Info</a></li>
+                </ul>
+                
+                <div class="mt-auto pt-4">
+                    <button id="logoutBtn" class="btn btn-error w-full">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main content -->
+        <div class="drawer-content flex flex-col">
+            <!-- Navbar -->
+            <div class="navbar bg-base-100 shadow-sm">
+                <div class="flex-none lg:hidden">
+                    <label for="my-drawer" class="btn btn-square btn-ghost">
+                        <i class="fas fa-bars"></i>
+                    </label>
+                </div>
+                <div class="flex-1">
+                    <h2 class="text-xl font-semibold" id="pageTitle">Dashboard</h2>
+                </div>
+                <div class="flex-none">
+                    <div class="badge badge-info" id="loginTime"></div>
+                </div>
+            </div>
+            
+            <!-- Page content -->
+            <div class="p-4 flex-1">
+                <!-- Dashboard Content -->
+                <div id="dashboardContent">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                        <!-- Stats Cards -->
+                        <div class="card p-4">
+                            <h3 class="text-lg font-semibold mb-2">System Overview</h3>
+                            <div id="systemStats" class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Images:</span>
+                                    <span id="imageCount" class="font-medium">Loading...</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Audio Files:</span>
+                                    <span id="audioCount" class="font-medium">Loading...</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Total Generations:</span>
+                                    <span id="totalGenerations" class="font-medium">Loading...</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Recent Activity (24h):</span>
+                                    <span id="recentActivity" class="font-medium">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card p-4">
+                            <h3 class="text-lg font-semibold mb-2">Storage Usage</h3>
+                            <div id="storageStats" class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Images Size:</span>
+                                    <span id="imagesSize" class="font-medium">Loading...</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Audio Size:</span>
+                                    <span id="audioSize" class="font-medium">Loading...</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Disk Used:</span>
+                                    <span id="diskUsed" class="font-medium">Loading...</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Memory Used:</span>
+                                    <span id="memoryUsed" class="font-medium">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card p-4">
+                            <h3 class="text-lg font-semibold mb-2">Quick Actions</h3>
+                            <div class="space-y-2">
+                                <button id="cleanupBtn" class="btn btn-primary w-full">
+                                    <i class="fas fa-trash-alt"></i> Cleanup Old Files
+                                </button>
+                                <button id="backupBtn" class="btn btn-secondary w-full">
+                                    <i class="fas fa-save"></i> Create Backup
+                                </button>
+                                <button id="testVoiceBtn" class="btn btn-accent w-full">
+                                    <i class="fas fa-volume-up"></i> Test Voice System
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-4 mb-6">
+                        <h3 class="text-lg font-semibold mb-4">Recent Generations</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full" id="recentGenerationsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Prompt</th>
+                                        <th>Image ID</th>
+                                        <th>Seed</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-4">
+                        <h3 class="text-lg font-semibold mb-4">System Information</h3>
+                        <div id="systemInfo" class="space-y-2">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Images Management Content -->
+                <div id="imagesContent" class="hidden">
+                    <div class="card p-4 mb-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold">Generated Images</h3>
+                            <div>
+                                <button id="deleteSelectedImages" class="btn btn-danger btn-sm mr-2" disabled>
+                                    <i class="fas fa-trash"></i> Delete Selected
+                                </button>
+                                <button id="refreshImages" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-sync"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full" id="imagesTable">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAllImages"></th>
+                                        <th>Preview</th>
+                                        <th>Filename</th>
+                                        <th>Size</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Audio Management Content -->
+                <div id="audioContent" class="hidden">
+                    <div class="card p-4 mb-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold">Generated Audio Files</h3>
+                            <div>
+                                <button id="deleteSelectedAudio" class="btn btn-danger btn-sm mr-2" disabled>
+                                    <i class="fas fa-trash"></i> Delete Selected
+                                </button>
+                                <button id="refreshAudio" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-sync"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full" id="audioTable">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAllAudio"></th>
+                                        <th>Filename</th>
+                                        <th>Size</th>
+                                        <th>Created</th>
+                                        <th>Play</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Logs Content -->
+                <div id="logsContent" class="hidden">
+                    <div class="card p-4">
+                        <h3 class="text-lg font-semibold mb-4">Generation Logs</h3>
+                        <div class="mb-4 flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <input type="text" id="logsSearch" placeholder="Search prompts..." class="input input-bordered">
+                                <button id="searchLogs" class="btn btn-primary">Search</button>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span>Page</span>
+                                <input type="number" id="logsPage" min="1" value="1" class="input input-bordered w-16">
+                                <span>of <span id="totalPages">1</span></span>
+                                <button id="prevPage" class="btn btn-sm">Prev</button>
+                                <button id="nextPage" class="btn btn-sm">Next</button>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full" id="logsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Prompt</th>
+                                        <th>Image ID</th>
+                                        <th>Seed</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Content -->
+                <div id="settingsContent" class="hidden">
+                    <div class="card p-4">
+                        <h3 class="text-lg font-semibold mb-4">System Settings</h3>
+                        
+                        <form id="settingsForm" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="label">
+                                        <span class="label-text">Max Images per Request</span>
+                                    </label>
+                                    <input type="number" name="max_images_per_request" class="input input-bordered w-full">
+                                </div>
+                                
+                                <div>
+                                    <label class="label">
+                                        <span class="label-text">Max Image Size (px)</span>
+                                    </label>
+                                    <input type="number" name="max_image_size" class="input input-bordered w-full">
+                                </div>
+                                
+                                <div>
+                                    <label class="label">
+                                        <span class="label-text">Auto Cleanup Hours</span>
+                                    </label>
+                                    <input type="number" name="auto_cleanup_hours" class="input input-bordered w-full">
+                                </div>
+                                
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">Enable Voice Features</span> 
+                                        <input type="checkbox" name="enable_voice" class="toggle toggle-primary">
+                                    </label>
+                                </div>
+                                
+                                <div>
+                                    <label class="label">
+                                        <span class="label-text">Default Model</span>
+                                    </label>
+                                    <select name="default_model" class="select select-bordered w-full">
+                                        <option value="flux">Flux</option>
+                                        <option value="realistic">Realistic</option>
+                                        <option value="anime">Anime</option>
+                                        <option value="digital-art">Digital Art</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="label">
+                                        <span class="label-text">Default Quality</span>
+                                    </label>
+                                    <select name="default_quality" class="select select-bordered w-full">
+                                        <option value="standard">Standard</option>
+                                        <option value="high">High</option>
+                                        <option value="ultra">Ultra</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end space-x-2">
+                                <button type="button" id="resetSettings" class="btn btn-ghost">Reset Defaults</button>
+                                <button type="submit" class="btn btn-primary">Save Settings</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- System Info Content -->
+                <div id="systemContent" class="hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="card p-4">
+                            <h3 class="text-lg font-semibold mb-4">CPU & Memory</h3>
+                            <div id="cpuMemoryInfo" class="space-y-2">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="card p-4">
+                            <h3 class="text-lg font-semibold mb-4">Disk & Network</h3>
+                            <div id="diskNetworkInfo" class="space-y-2">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="card p-4 md:col-span-2">
+                            <h3 class="text-lg font-semibold mb-4">Process Information</h3>
+                            <div id="processInfo" class="space-y-2">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="cleanupModal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Cleanup Old Files</h3>
+            <div class="py-4 space-y-4">
+                <div class="form-control">
+                    <label class="label cursor-pointer">
+                        <span class="label-text">Cleanup Images</span> 
+                        <input type="checkbox" id="cleanupImages" class="toggle" checked>
+                    </label>
+                </div>
+                
+                <div class="form-control">
+                    <label class="label cursor-pointer">
+                        <span class="label-text">Cleanup Audio</span> 
+                        <input type="checkbox" id="cleanupAudio" class="toggle" checked>
+                    </label>
+                </div>
+                
+                <div>
+                    <label class="label">
+                        <span class="label-text">Max Age (hours)</span>
+                    </label>
+                    <input type="number" id="cleanupAge" class="input input-bordered w-full" value="24">
+                </div>
+            </div>
+            <div class="modal-action">
+                <button id="confirmCleanup" class="btn btn-primary">Cleanup</button>
+                <button id="cancelCleanup" class="btn btn-ghost">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="backupModal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Create Backup</h3>
+            <div class="py-4">
+                <p>This will create a backup of:</p>
+                <ul class="list-disc pl-5 mt-2 space-y-1">
+                    <li>Generation logs</li>
+                    <li>System settings</li>
+                    <li>Recent images (last 24 hours)</li>
+                </ul>
+            </div>
+            <div class="modal-action">
+                <button id="confirmBackup" class="btn btn-primary">Create Backup</button>
+                <button id="cancelBackup" class="btn btn-ghost">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="testVoiceModal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Test Voice System</h3>
+            <div class="py-4 space-y-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Test Text</span>
+                    </label>
+                    <input type="text" id="testVoiceText" class="input input-bordered w-full" 
+                           value="This is a test of the voice system">
+                </div>
+                
+                <div class="flex justify-center">
+                    <button id="playTestVoice" class="btn btn-accent">
+                        <i class="fas fa-volume-up mr-2"></i> Play Test
+                    </button>
+                </div>
+                
+                <div id="voiceTestResult" class="mt-4 hidden">
+                    <div class="alert alert-success">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span id="voiceTestMessage">Voice test was successful!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-action">
+                <button id="closeVoiceTest" class="btn btn-ghost">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        let currentPage = 'dashboard';
+        let audioPlayers = {};
+        
+        // Initialize the admin dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if admin is logged in
+            checkAdminSession();
+            
+            // Navigation links
+            document.getElementById('dashboardLink').addEventListener('click', () => showPage('dashboard'));
+            document.getElementById('imagesLink').addEventListener('click', () => showPage('images'));
+            document.getElementById('audioLink').addEventListener('click', () => showPage('audio'));
+            document.getElementById('logsLink').addEventListener('click', () => showPage('logs'));
+            document.getElementById('settingsLink').addEventListener('click', () => showPage('settings'));
+            document.getElementById('systemLink').addEventListener('click', () => showPage('system'));
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', logoutAdmin);
+            
+            // Quick action buttons
+            document.getElementById('cleanupBtn').addEventListener('click', showCleanupModal);
+            document.getElementById('backupBtn').addEventListener('click', showBackupModal);
+            document.getElementById('testVoiceBtn').addEventListener('click', showTestVoiceModal);
+            
+            // Image management
+            document.getElementById('refreshImages').addEventListener('click', loadImages);
+            document.getElementById('selectAllImages').addEventListener('change', toggleSelectAllImages);
+            document.getElementById('deleteSelectedImages').addEventListener('click', deleteSelectedImages);
+            
+            // Audio management
+            document.getElementById('refreshAudio').addEventListener('click', loadAudioFiles);
+            document.getElementById('selectAllAudio').addEventListener('change', toggleSelectAllAudio);
+            document.getElementById('deleteSelectedAudio').addEventListener('click', deleteSelectedAudioFiles);
+            
+            // Logs management
+            document.getElementById('searchLogs').addEventListener('click', searchLogs);
+            document.getElementById('prevPage').addEventListener('click', prevLogsPage);
+            document.getElementById('nextPage').addEventListener('click', nextLogsPage);
+            document.getElementById('logsPage').addEventListener('change', goToLogsPage);
+            
+            // Settings
+            document.getElementById('settingsForm').addEventListener('submit', saveSettings);
+            document.getElementById('resetSettings').addEventListener('click', resetSettings);
+            
+            // Modal buttons
+            document.getElementById('confirmCleanup').addEventListener('click', performCleanup);
+            document.getElementById('cancelCleanup').addEventListener('click', closeCleanupModal);
+            document.getElementById('confirmBackup').addEventListener('click', performBackup);
+            document.getElementById('cancelBackup').addEventListener('click', closeBackupModal);
+            document.getElementById('playTestVoice').addEventListener('click', testVoiceSystem);
+            document.getElementById('closeVoiceTest').addEventListener('click', closeTestVoiceModal);
+            
+            // Load initial data
+            loadDashboardStats();
+            loadSettings();
+        });
+        
+        // Check admin session
+        function checkAdminSession() {
+            fetch('/api/admin/stats')
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = '/admin/login';
+                    } else {
+                        updateLoginTime();
+                    }
+                })
+                .catch(error => {
+                    console.error('Session check error:', error);
+                    window.location.href = '/admin/login';
+                });
+        }
+        
+        // Update login time display
+        function updateLoginTime() {
+            fetch('/api/admin/stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const loginTime = new Date(data.stats.system_info.boot_time).toLocaleString();
+                        document.getElementById('loginTime').textContent = `Logged in since ${loginTime}`;
+                    }
+                });
+        }
+        
+        // Show page content
+        function showPage(page) {
+            currentPage = page;
+            
+            // Hide all content sections
+            document.querySelectorAll('[id$="Content"]').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show selected content section
+            document.getElementById(`${page}Content`).classList.remove('hidden');
+            
+            // Update page title
+            document.getElementById('pageTitle').textContent = 
+                page.charAt(0).toUpperCase() + page.slice(1) + (page === 'dashboard' ? '' : ' Management');
+            
+            // Load page-specific data
+            switch(page) {
+                case 'dashboard':
+                    loadDashboardStats();
+                    break;
+                case 'images':
+                    loadImages();
+                    break;
+                case 'audio':
+                    loadAudioFiles();
+                    break;
+                case 'logs':
+                    loadLogs();
+                    break;
+                case 'system':
+                    loadSystemInfo();
+                    break;
+            }
+        }
+        
+        // Load dashboard stats
+        function loadDashboardStats() {
+            fetch('/api/admin/stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update stats cards
+                        document.getElementById('imageCount').textContent = data.stats.total_images;
+                        document.getElementById('audioCount').textContent = data.stats.total_audio;
+                        document.getElementById('totalGenerations').textContent = data.stats.total_generations;
+                        document.getElementById('recentActivity').textContent = data.stats.recent_activity;
+                        
+                        document.getElementById('imagesSize').textContent = `${data.stats.images_size_mb} MB`;
+                        document.getElementById('audioSize').textContent = `${data.stats.audio_size_mb} MB`;
+                        document.getElementById('diskUsed').textContent = `${data.stats.system_info.disk_used.toFixed(1)} GB / ${data.stats.system_info.disk_total.toFixed(1)} GB`;
+                        document.getElementById('memoryUsed').textContent = `${data.stats.system_info.memory_used.toFixed(1)} GB / ${data.stats.system_info.memory_total.toFixed(1)} GB`;
+                        
+                        // Update recent generations table
+                        const tbody = document.querySelector('#recentGenerationsTable tbody');
+                        tbody.innerHTML = '';
+                        
+                        if (data.recent_generations && data.recent_generations.length > 0) {
+                            data.recent_generations.forEach(log => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${new Date(log.timestamp).toLocaleString()}</td>
+                                    <td class="truncate max-w-xs" title="${log.prompt}">${log.prompt}</td>
+                                    <td>${log.image_id || 'N/A'}</td>
+                                    <td>${log.seed || 'N/A'}</td>
+                                `;
+                                tbody.appendChild(row);
+                            });
+                        } else {
+                            const row = document.createElement('tr');
+                            row.innerHTML = '<td colspan="4" class="text-center py-4">No recent generations</td>';
+                            tbody.appendChild(row);
+                        }
+                        
+                        // Update system info
+                        const systemInfoDiv = document.getElementById('systemInfo');
+                        if (data.stats.system_info) {
+                            const si = data.stats.system_info;
+                            systemInfoDiv.innerHTML = `
+                                <div class="flex justify-between">
+                                    <span>Platform:</span>
+                                    <span>${si.platform} ${si.platform_version}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Python Version:</span>
+                                    <span>${si.python_version}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>CPU:</span>
+                                    <span>${si.cpu_count} cores, ${si.cpu_percent}% usage</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Memory:</span>
+                                    <span>${si.memory.percent}% used (${si.memory.used.toFixed(1)}/${si.memory.total.toFixed(1)} GB)</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Disk:</span>
+                                    <span>${si.disk.percent.toFixed(1)}% used (${si.disk.used.toFixed(1)}/${si.disk.total.toFixed(1)} GB)</span>
+                                </div>
+                            `;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading dashboard stats:', error);
+                    alert('Failed to load dashboard data');
+                });
+        }
+        
+        // Load images
+        function loadImages() {
+            fetch('/api/admin/images')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const tbody = document.querySelector('#imagesTable tbody');
+                        tbody.innerHTML = '';
+                        
+                        if (data.images && data.images.length > 0) {
+                            data.images.forEach(image => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td><input type="checkbox" class="image-checkbox" data-filename="${image.filename}"></td>
+                                    <td>
+                                        <div class="avatar">
+                                            <div class="w-12 h-12 rounded">
+                                                <img src="${image.url}" alt="${image.filename}" class="object-cover">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>${image.filename}</td>
+                                    <td>${image.size_mb} MB</td>
+                                    <td>${new Date(image.created).toLocaleString()}</td>
+                                    <td>
+                                        <div class="flex space-x-1">
+                                            <a href="${image.url}" target="_blank" class="btn btn-xs btn-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="btn btn-xs btn-error delete-image" data-filename="${image.filename}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                `;
+                                tbody.appendChild(row);
+                            });
+                            
+                            // Add event listeners to delete buttons
+                            document.querySelectorAll('.delete-image').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    const filename = this.getAttribute('data-filename');
+                                    deleteImage(filename);
+                                });
+                            });
+                            
+                            // Add event listeners to checkboxes
+                            document.querySelectorAll('.image-checkbox').forEach(checkbox => {
+                                checkbox.addEventListener('change', updateImageSelection);
+                            });
+                        } else {
+                            const row = document.createElement('tr');
+                            row.innerHTML = '<td colspan="6" class="text-center py-4">No images found</td>';
+                            tbody.appendChild(row);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading images:', error);
+                    alert('Failed to load images');
+                });
+        }
+        
+        // Load audio files
+        function loadAudioFiles() {
+            fetch('/api/admin/audio')  // Note: You'll need to implement this endpoint
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const tbody = document.querySelector('#audioTable tbody');
+                        tbody.innerHTML = '';
+                        
+                        if (data.audio_files && data.audio_files.length > 0) {
+                            data.audio_files.forEach(audio => {
+                                const playerId = `player-${audio.filename.replace('.', '-')}`;
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td><input type="checkbox" class="audio-checkbox" data-filename="${audio.filename}"></td>
+                                    <td>${audio.filename}</td>
+                                    <td>${audio.size_mb} MB</td>
+                                    <td>${new Date(audio.created).toLocaleString()}</td>
+                                    <td>
+                                        <audio id="${playerId}" class="audio-player" controls>
+                                            <source src="/static/audio/${audio.filename}" type="audio/mpeg">
+                                        </audio>
+                                    </td>
+                                    <td>
+                                        <div class="flex space-x-1">
+                                            <button class="btn btn-xs btn-error delete-audio" data-filename="${audio.filename}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                `;
+                                tbody.appendChild(row);
+                                
+                                // Store player reference
+                                audioPlayers[audio.filename] = document.getElementById(playerId);
+                            });
+                            
+                            // Add event listeners to delete buttons
+                            document.querySelectorAll('.delete-audio').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    const filename = this.getAttribute('data-filename');
+                                    deleteAudioFile(filename);
+                                });
+                            });
+                            
+                            // Add event listeners to checkboxes
+                            document.querySelectorAll('.audio-checkbox').forEach(checkbox => {
+                                checkbox.addEventListener('change', updateAudioSelection);
+                            });
+                        } else {
+                            const row = document.createElement('tr');
+                            row.innerHTML = '<td colspan="6" class="text-center py-4">No audio files found</td>';
+                            tbody.appendChild(row);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading audio files:', error);
+                    alert('Failed to load audio files');
+                });
+        }
+        
+        // Load logs
+        function loadLogs(page = 1, search = '') {
+            let url = `/api/admin/logs?page=${page}&per_page=50`;
+            if (search) {
+                url += `&search=${encodeURIComponent(search)}`;
+            }
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const tbody = document.querySelector('#logsTable tbody');
+                        tbody.innerHTML = '';
+                        
+                        // Update pagination controls
+                        document.getElementById('logsPage').value = data.page;
+                        document.getElementById('totalPages').textContent = data.total_pages;
+                        
+                        if (data.logs && data.logs.length > 0) {
+                            data.logs.forEach(log => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${new Date(log.timestamp).toLocaleString()}</td>
+                                    <td class="truncate max-w-xs" title="${log.prompt}">${log.prompt}</td>
+                                    <td>${log.image_id || 'N/A'}</td>
+                                    <td>${log.seed || 'N/A'}</td>
+                                `;
+                                tbody.appendChild(row);
+                            });
+                        } else {
+                            const row = document.createElement('tr');
+                            row.innerHTML = '<td colspan="4" class="text-center py-4">No logs found</td>';
+                            tbody.appendChild(row);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading logs:', error);
+                    alert('Failed to load logs');
+                });
+        }
+        
+        // Load system info
+        function loadSystemInfo() {
+            fetch('/api/admin/system-info')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const si = data.system_info;
+                        
+                        // CPU & Memory
+                        document.getElementById('cpuMemoryInfo').innerHTML = `
+                            <div class="flex justify-between">
+                                <span>CPU Usage:</span>
+                                <span>${si.cpu_percent}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>CPU Cores:</span>
+                                <span>${si.cpu_count}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Memory Usage:</span>
+                                <span>${si.memory.percent}% (${(si.memory.used / (1024 ** 3)).toFixed(1)}/${(si.memory.total / (1024 ** 3)).toFixed(1)} GB)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Available Memory:</span>
+                                <span>${(si.memory.available / (1024 ** 3)).toFixed(1)} GB</span>
+                            </div>
+                        `;
+                        
+                        // Disk & Network
+                        document.getElementById('diskNetworkInfo').innerHTML = `
+                            <div class="flex justify-between">
+                                <span>Disk Usage:</span>
+                                <span>${si.disk.percent.toFixed(1)}% (${(si.disk.used / (1024 ** 3)).toFixed(1)}/${(si.disk.total / (1024 ** 3)).toFixed(1)} GB)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Free Disk:</span>
+                                <span>${(si.disk.free / (1024 ** 3)).toFixed(1)} GB</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Data Sent:</span>
+                                <span>${(si.network.bytes_sent / (1024 ** 2)).toFixed(2)} MB</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Data Received:</span>
+                                <span>${(si.network.bytes_recv / (1024 ** 2)).toFixed(2)} MB</span>
+                            </div>
+                        `;
+                        
+                        // Process info
+                        document.getElementById('processInfo').innerHTML = `
+                            <div class="flex justify-between">
+                                <span>Running Processes:</span>
+                                <span>${si.process_count}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Platform:</span>
+                                <span>${si.platform} ${si.platform_version}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Python Version:</span>
+                                <span>${si.python_version}</span>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading system info:', error);
+                    alert('Failed to load system information');
+                });
+        }
+        
+        // Load settings
+        function loadSettings() {
+            fetch('/api/admin/settings')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const form = document.getElementById('settingsForm');
+                        
+                        // Fill form with current settings
+                        Object.keys(data.settings).forEach(key => {
+                            const element = form.elements[key];
+                            if (element) {
+                                if (element.type === 'checkbox') {
+                                    element.checked = data.settings[key];
+                                } else {
+                                    element.value = data.settings[key];
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading settings:', error);
+                    alert('Failed to load settings');
+                });
+        }
+        
+        // Save settings
+        function saveSettings(e) {
+            e.preventDefault();
+            
+            const form = document.getElementById('settingsForm');
+            const formData = new FormData(form);
+            const settings = {};
+            
+            formData.forEach((value, key) => {
+                if (form.elements[key].type === 'checkbox') {
+                    settings[key] = form.elements[key].checked;
+                } else if (form.elements[key].type === 'number') {
+                    settings[key] = parseInt(value) || 0;
+                } else {
+                    settings[key] = value;
+                }
+            });
+            
+            fetch('/api/admin/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(settings)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Settings saved successfully');
+                } else {
+                    alert(`Failed to save settings: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving settings:', error);
+                alert('Failed to save settings');
+            });
+        }
+        
+        // Reset settings to defaults
+        function resetSettings() {
+            if (confirm('Are you sure you want to reset all settings to defaults?')) {
+                fetch('/api/admin/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Settings reset to defaults');
+                        loadSettings();
+                    } else {
+                        alert(`Failed to reset settings: ${data.error}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error resetting settings:', error);
+                    alert('Failed to reset settings');
+                });
+            }
+        }
+        
+        // Delete image
+        function deleteImage(filename) {
+            if (confirm(`Are you sure you want to delete ${filename}?`)) {
+                fetch(`/api/admin/delete-image/${filename}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Image ${filename} deleted successfully`);
+                        loadImages();
+                    } else {
+                        alert(`Failed to delete image: ${data.error}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting image:', error);
+                    alert('Failed to delete image');
+                });
+            }
+        }
+        
+        // Delete audio file
+        function deleteAudioFile(filename) {
+            if (confirm(`Are you sure you want to delete ${filename}?`)) {
+                fetch(`/api/admin/delete-audio/${filename}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Audio file ${filename} deleted successfully`);
+                        loadAudioFiles();
+                    } else {
+                        alert(`Failed to delete audio file: ${data.error}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting audio file:', error);
+                    alert('Failed to delete audio file');
+                });
+            }
+        }
+        
+        // Toggle select all images
+        function toggleSelectAllImages(e) {
+            const checkboxes = document.querySelectorAll('.image-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = e.target.checked;
+            });
+            updateImageSelection();
+        }
+        
+        // Update image selection
+        function updateImageSelection() {
+            const checkboxes = document.querySelectorAll('.image-checkbox:checked');
+            const deleteBtn = document.getElementById('deleteSelectedImages');
+            
+            deleteBtn.disabled = checkboxes.length === 0;
+        }
+        
+        // Delete selected images
+        function deleteSelectedImages() {
+            const checkboxes = document.querySelectorAll('.image-checkbox:checked');
+            const filenames = Array.from(checkboxes).map(checkbox => checkbox.getAttribute('data-filename'));
+            
+            if (filenames.length === 0) return;
+            
+            if (confirm(`Are you sure you want to delete ${filenames.length} selected images?`)) {
+                const promises = filenames.map(filename => {
+                    return fetch(`/api/admin/delete-image/${filename}`, {
+                        method: 'DELETE'
+                    }).then(response => response.json());
+                });
+                
+                Promise.all(promises)
+                    .then(results => {
+                        const successCount = results.filter(r => r.success).length;
+                        alert(`Deleted ${successCount} of ${filenames.length} images`);
+                        loadImages();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting images:', error);
+                        alert('Error occurred while deleting images');
+                    });
+            }
+        }
+        
+        // Toggle select all audio files
+        function toggleSelectAllAudio(e) {
+            const checkboxes = document.querySelectorAll('.audio-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = e.target.checked;
+            });
+            updateAudioSelection();
+        }
+        
+        // Update audio selection
+        function updateAudioSelection() {
+            const checkboxes = document.querySelectorAll('.audio-checkbox:checked');
+            const deleteBtn = document.getElementById('deleteSelectedAudio');
+            
+            deleteBtn.disabled = checkboxes.length === 0;
+        }
+        
+        // Delete selected audio files
+        function deleteSelectedAudioFiles() {
+            const checkboxes = document.querySelectorAll('.audio-checkbox:checked');
+            const filenames = Array.from(checkboxes).map(checkbox => checkbox.getAttribute('data-filename'));
+            
+            if (filenames.length === 0) return;
+            
+            if (confirm(`Are you sure you want to delete ${filenames.length} selected audio files?`)) {
+                const promises = filenames.map(filename => {
+                    return fetch(`/api/admin/delete-audio/${filename}`, {
+                        method: 'DELETE'
+                    }).then(response => response.json());
+                });
+                
+                Promise.all(promises)
+                    .then(results => {
+                        const successCount = results.filter(r => r.success).length;
+                        alert(`Deleted ${successCount} of ${filenames.length} audio files`);
+                        loadAudioFiles();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting audio files:', error);
+                        alert('Error occurred while deleting audio files');
+                    });
+            }
+        }
+        
+        // Search logs
+        function searchLogs() {
+            const searchText = document.getElementById('logsSearch').value.trim();
+            loadLogs(1, searchText);
+        }
+        
+        // Previous logs page
+        function prevLogsPage() {
+            const currentPage = parseInt(document.getElementById('logsPage').value);
+            if (currentPage > 1) {
+                loadLogs(currentPage - 1, document.getElementById('logsSearch').value.trim());
+            }
+        }
+        
+        // Next logs page
+        function nextLogsPage() {
+            const currentPage = parseInt(document.getElementById('logsPage').value);
+            const totalPages = parseInt(document.getElementById('totalPages').textContent);
+            
+            if (currentPage < totalPages) {
+                loadLogs(currentPage + 1, document.getElementById('logsSearch').value.trim());
+            }
+        }
+        
+        // Go to specific logs page
+        function goToLogsPage() {
+            const page = parseInt(document.getElementById('logsPage').value);
+            const totalPages = parseInt(document.getElementById('totalPages').textContent);
+            
+            if (page >= 1 && page <= totalPages) {
+                loadLogs(page, document.getElementById('logsSearch').value.trim());
+            } else {
+                document.getElementById('logsPage').value = 1;
+            }
+        }
+        
+        // Show cleanup modal
+        function showCleanupModal() {
+            document.getElementById('cleanupModal').classList.add('modal-open');
+        }
+        
+        // Close cleanup modal
+        function closeCleanupModal() {
+            document.getElementById('cleanupModal').classList.remove('modal-open');
+        }
+        
+        // Perform cleanup
+        function performCleanup() {
+            const cleanupImages = document.getElementById('cleanupImages').checked;
+            const cleanupAudio = document.getElementById('cleanupAudio').checked;
+            const maxAgeHours = parseInt(document.getElementById('cleanupAge').value) || 24;
+            
+            let type = 'all';
+            if (cleanupImages && !cleanupAudio) type = 'images';
+            if (!cleanupImages && cleanupAudio) type = 'audio';
+            
+            fetch('/api/admin/cleanup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    type: type,
+                    max_age_hours: maxAgeHours
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Cleanup completed. Deleted ${data.deleted_files.images} images and ${data.deleted_files.audio} audio files`);
+                    closeCleanupModal();
+                    loadDashboardStats();
+                    
+                    if (currentPage === 'images') loadImages();
+                    if (currentPage === 'audio') loadAudioFiles();
+                } else {
+                    alert(`Cleanup failed: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error performing cleanup:', error);
+                alert('Failed to perform cleanup');
+            });
+        }
+        
+        // Show backup modal
+        function showBackupModal() {
+            document.getElementById('backupModal').classList.add('modal-open');
+        }
+        
+        // Close backup modal
+        function closeBackupModal() {
+            document.getElementById('backupModal').classList.remove('modal-open');
+        }
+        
+        // Perform backup
+        function performBackup() {
+            fetch('/api/admin/backup', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Backup created successfully in ${data.backup_dir}`);
+                    closeBackupModal();
+                } else {
+                    alert(`Backup failed: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error performing backup:', error);
+                alert('Failed to perform backup');
+            });
+        }
+        
+        // Show test voice modal
+        function showTestVoiceModal() {
+            document.getElementById('testVoiceModal').classList.add('modal-open');
+            document.getElementById('voiceTestResult').classList.add('hidden');
+        }
+        
+        // Close test voice modal
+        function closeTestVoiceModal() {
+            document.getElementById('testVoiceModal').classList.remove('modal-open');
+        }
+        
+        // Test voice system
+        function testVoiceSystem() {
+            const testText = document.getElementById('testVoiceText').value.trim();
+            
+            if (!testText) {
+                alert('Please enter test text');
+                return;
+            }
+            
+            fetch('/api/admin/test-voice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: testText
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('voiceTestResult');
+                const messageSpan = document.getElementById('voiceTestMessage');
+                
+                if (data.success) {
+                    resultDiv.classList.remove('hidden');
+                    messageSpan.textContent = 'Voice test was successful!';
+                    
+                    // Play the test audio
+                    const audio = new Audio(data.tts_test.audio_url);
+                    audio.play();
+                } else {
+                    resultDiv.classList.remove('hidden');
+                    messageSpan.textContent = `Voice test failed: ${data.error}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error testing voice:', error);
+                alert('Failed to test voice system');
+            });
+        }
+        
+        // Logout admin
+        function logoutAdmin() {
+            fetch('/admin/logout', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/admin/login';
+                } else {
+                    alert('Logout failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error logging out:', error);
+                alert('Failed to logout');
+            });
+        }
+    </script>
+</body>
+</html>
